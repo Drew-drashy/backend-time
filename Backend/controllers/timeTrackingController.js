@@ -1,4 +1,4 @@
-const TimeLog = require('../models/TimeLog');
+const TimeLog = require('../models/Timelog');
 const Project =require('../models/Project');
 const { checkIfInsideGeofence } = require('../utils/geoUtils');
 
