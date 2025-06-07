@@ -1,6 +1,6 @@
 const { checkIfInsideGeofence } = require('../utils/geoUtils');
 const Geofence = require('../models/Geofence');
-const TimeLog = require('../models/TimeLog');
+const TimeLog = require('../models/Timelog');
 const Project=require('../models/Project');
 let io;
 exports.setupSocket = (server) => {
