@@ -1,4 +1,4 @@
-const TimeLog = require('../models/Timelog');
+const TimeLog = require('../models/TimeLog');
 const Project =require('../models/Project');
 const { checkIfInsideGeofence } = require('../utils/geoUtils');
 
@@ -83,10 +83,10 @@ exports.startSession = async (req, res) => {
       const fmt = project.startTime.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
       return res.status(400).json({ message: `Cannot start before ${fmt}` });
     }
-    if (project.endTime && now > project.endTime) {
-      const fmt = project.endTime.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
-      return res.status(400).json({ message: `Cannot start after ${fmt}` });
-    }
+    // if (project.endTime && now > project.endTime) {
+    //   const fmt = project.endTime.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+    //   return res.status(400).json({ message: `Cannot start after ${fmt}` });
+    // }
 
     // Create the TimeLog
     const timeLog = await TimeLog.create({
@@ -97,31 +97,31 @@ exports.startSession = async (req, res) => {
     });
 
     // ► Schedule auto‐end at project.endTime if one is set and in the future
-    if (project.endTime) {
-      const msUntilEnd = project.endTime.getTime() - now.getTime();
-      if (msUntilEnd > 0) {
-        setTimeout(async () => {
-          try {
-            const session = await TimeLog.findById(timeLog._id);
-            if (session && !session.endTime) {
-              session.endTime = project.endTime;
-              session.endLocation = session.startLocation;    // or null
-              session.totalHours = (session.endTime - session.startTime) / 3_600_000;
-              await session.save();
-              console.log(`Auto-ended session ${session._id}`);
-            }
-          } catch (e) {
-            console.error('Auto-end failed for session', timeLog._id, e);
-          }
-        }, msUntilEnd);
-      } else {
-        // If endTime is already passed, end immediately
-        timeLog.endTime = project.endTime;
-        timeLog.endLocation = { latitude, longitude };
-        timeLog.totalHours = (project.endTime - now) / 3_600_000;
-        await timeLog.save();
-      }
-    }
+    // if (project.endTime) {
+    //   const msUntilEnd = project.endTime.getTime() - now.getTime();
+    //   if (msUntilEnd > 0) {
+    //     setTimeout(async () => {
+    //       try {
+    //         const session = await TimeLog.findById(timeLog._id);
+    //         if (session && !session.endTime) {
+    //           session.endTime = project.endTime;
+    //           session.endLocation = session.startLocation;    // or null
+    //           session.totalHours = (session.endTime - session.startTime) / 3_600_000;
+    //           await session.save();
+    //           console.log(`Auto-ended session ${session._id}`);
+    //         }
+    //       } catch (e) {
+    //         console.error('Auto-end failed for session', timeLog._id, e);
+    //       }
+    //     }, msUntilEnd);
+    //   } else {
+    //     // If endTime is already passed, end immediately
+    //     timeLog.endTime = project.endTime;
+    //     timeLog.endLocation = { latitude, longitude };
+    //     timeLog.totalHours = (project.endTime - now) / 3_600_000;
+    //     await timeLog.save();
+    //   }
+    // }
 
     return res.status(201).json(timeLog);
   } catch (err) {

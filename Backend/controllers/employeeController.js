@@ -38,3 +38,24 @@ exports.removeEmployeeFromProject =async(req,res)=>{
         return res.status(500).json({ message: 'Failed to remove employee from project' });
     }
 }
+
+exports.getEmails=async(req,res)=>{
+    try{
+        const {email}=req.body;
+        const lowerEmail=email.toLowerCase();
+        console.log(email,'emailssss');
+        if(!lowerEmail || lowerEmail.length<2) return res.json({emails:[]});
+
+        const user=await User
+        .find({email:{$regex: '^'+lowerEmail,$options: 'i'}})
+        .limit(10)
+        .select('email -_id');
+
+        res.json({emails:user.map(u=>u.email)});
+
+    }
+    catch(err){
+        console.error(err);
+        return res.status(400).json({message:'Cannot find the Emails'});
+    }
+}

@@ -1,3 +1,4 @@
+const { default: mongoose } = require('mongoose');
 const Project = require('../models/Project');
 const User = require('../models/User');
 
@@ -18,7 +19,7 @@ exports.getProjects = async (req, res) => {
     const page = parseInt(req.query.page) || 1;         // current page
     const limit = parseInt(req.query.limit) || 10;      // items per page
     const skip = (page - 1) * limit;
-    const {search='',status, date}=req.query;
+    const {search='',status, date, id}=req.query;
     const filter={};
     if(search){
       filter.name={$regex: search,$options:'i'};
@@ -27,10 +28,15 @@ exports.getProjects = async (req, res) => {
       filter.status=status;
     }
     if(date){
-      filter.deadline={$lte: new Date(date)};
+      filter.assignedEmployees=id;
     }
-
-    const total = await Project.countDocuments();        // total items
+    if(id){
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: 'Invalid id format' });
+      }
+      filter.assignedEmployees = new  mongoose.Types.ObjectId(id);
+    }
+    const total = await Project.countDocuments(filter);        // total items
     const projects = await Project.find(filter)
       .populate('assignedEmployees', 'name email')
       .skip(skip)
