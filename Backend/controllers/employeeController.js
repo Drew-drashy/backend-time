@@ -11,7 +11,7 @@ exports.getEmployee= async (req,res)=>{
         const {employeeId}=req.params;
         const employee=await User.findById(employeeId);
         if(!employee) return res.status(400).json({message:'Employee Id is not Found'});
-        console.log(employee);
+        // console.log(employee);
         return res.status(200).json({employee});
     }
     catch(err){
@@ -43,7 +43,7 @@ exports.getEmails=async(req,res)=>{
     try{
         const {email}=req.body;
         const lowerEmail=email.toLowerCase();
-        console.log(email,'emailssss');
+        // console.log(email,'emailssss');
         if(!lowerEmail || lowerEmail.length<2) return res.json({emails:[]});
 
         const user=await User

@@ -19,7 +19,7 @@ exports.getProjects = async (req, res) => {
     const page = parseInt(req.query.page) || 1;         // current page
     const limit = parseInt(req.query.limit) || 10;      // items per page
     const skip = (page - 1) * limit;
-    const {search='',status, date, id}=req.query;
+    const {search='',status, DOI, id}=req.query;
     const filter={};
     if(search){
       filter.name={$regex: search,$options:'i'};
@@ -27,8 +27,8 @@ exports.getProjects = async (req, res) => {
     if(status){
       filter.status=status;
     }
-    if(date){
-      filter.assignedEmployees=id;
+    if(DOI){
+      filter.DOI={$lte:new Date(DOI)};
     }
     if(id){
       if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -66,6 +66,8 @@ exports.updateProject = async (req, res) => {
       status,
       startTime,
       endTime,
+      oneDriveLink,
+      DOI,
       addressName,
       assignedEmails,deadline}=req.body;
       const assignedEmployees=assignedEmails;
@@ -84,9 +86,11 @@ exports.updateProject = async (req, res) => {
       radius,
       workingHours,
       status,
-      deadline,
-      startTime,
-      endTime,
+      // deadline,
+      // startTime,
+      // endTime,
+      DOI,
+      oneDriveLink,
       addressName,
       assignedEmployees:userIds}, { new: true });
     console.log(project,'project in backend');

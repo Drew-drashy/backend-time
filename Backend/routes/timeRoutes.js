@@ -6,5 +6,5 @@ const router = express.Router();
 router.post('/time/start', protect, startSession);
 router.post('/time/end', protect, endSession);
 router.get('/time/logs', protect, getLogs);
-router.get('/time/logs/admin/:employeeId', protect, getLogsByAdmin);
+router.get('/time/logs/admin/:employeeId/:projectId', protect, getLogsByAdmin);
 module.exports = router;

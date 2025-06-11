@@ -79,10 +79,10 @@ exports.startSession = async (req, res) => {
     const now = new Date();
 
     // Time‐window checks
-    if (project.startTime && now < project.startTime) {
-      const fmt = project.startTime.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
-      return res.status(400).json({ message: `Cannot start before ${fmt}` });
-    }
+    // if (project.startTime && now < project.startTime) {
+    //   const fmt = project.startTime.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+    //   return res.status(400).json({ message: `Cannot start before ${fmt}` });
+    // }
     // if (project.endTime && now > project.endTime) {
     //   const fmt = project.endTime.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
     //   return res.status(400).json({ message: `Cannot start after ${fmt}` });
@@ -151,16 +151,16 @@ exports.endSession = async (req, res) => {
 
     // End the session
     // session.endTime = new Date();
-    if (session.endTime) {
-      return res
-        .status(409)
-        .json({ msg: 'Session has already ended.' });
-    }
-
+    // if (session.endTime) {
+    //   return res
+    //     .status(409)
+    //     .json({ msg: 'Session has already ended.' });
+    // }
+    const now=new  Date();
     session.endLocation = { latitude, longitude };
 
     // Calculate hours, rounded to 2 decimals
-    const diffMs = session.endTime.getTime() - session.startTime.getTime();
+    const diffMs = now.getTime() - session.startTime.getTime();
     const hours = diffMs / 3600000;
     session.totalHours = Number(hours.toFixed(2));
 
@@ -220,21 +220,14 @@ exports.getLogs = async (req, res) => {
   }
 };
 
-// const TimeLog = require('../models/TimeLog');
 
-/**
- * GET /api/time/logs/admin/:employeeId
- * Query params:
- *   - groupByDate=true  → returns [{ date, totalHours, images: [] }, …]
- * Otherwise returns flat array of TimeLog documents.
- */
 exports.getLogsByAdmin = async (req, res) => {
   try {
-    const { employeeId } = req.params;
+    const { employeeId,projectId } = req.params;
     const { groupByDate } = req.query;
 
-    // Fetch all logs for that user, plus project name and any uploads array
-    const logs = await TimeLog.find({ user: employeeId })
+    // console.log('jiiii');
+    const logs = await TimeLog.find({ user: employeeId,project:projectId})
       .populate('project', 'name')
       .sort({ startTime: -1 });
 
@@ -257,6 +250,7 @@ exports.getLogsByAdmin = async (req, res) => {
     // Flat list fallback
     return res.status(200).json(logs);
   } catch (err) {
+    console.log('hii');
     console.error('Admin log fetch error:', err);
     return res.status(500).json({ message: 'Error fetching employee logs' });
   }

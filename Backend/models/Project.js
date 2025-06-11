@@ -62,6 +62,12 @@ const projectSchema=new mongoose.Schema({
     phone:{
         type: String
     },
+    oneDriveLink:{
+        type: String,
+    },
+    DOI:{
+        type:Date
+    }
     
 
 },{timestamps:true});
